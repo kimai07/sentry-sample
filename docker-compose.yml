@@ -1,57 +1,59 @@
-version: '2'
-
-volumes:
-   pgdb:
-
+version: '3.9'
 services:
+  sentry:
+    container_name: sentry
+    image: sentry
+    platform: linux/amd64
+    env_file:
+      - .env
+    ports:
+      - 9000:9000
+    depends_on:
+      - redis
+      - postgres
+    tty: true
+    stdin_open: true
+
+  cron:
+    container_name: sentry-cron
+    image: sentry
+    platform: linux/amd64
+    command: run cron
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - postgres
+
+  worker:
+    container_name: sentry-worker
+    image: sentry
+    platform: linux/amd64
+    command: run worker
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - postgres
+
   redis:
+    container_name: sentry-redis
     image: redis
+    volumes:
+      - redis-data:/data
+    ports:
+      - '6379:6379'
 
   postgres:
+    container_name: sentry-postgres
     image: postgres
     environment:
       POSTGRES_USER: sentry
-      POSTGRES_PASSWORD: sentry
-      POSTGRES_DB: sentry
+      POSTGRES_PASSWORD: secret
     volumes:
-     - pgdb:/var/lib/postgresql/data
-
-  sentry:
-    image: sentry
-    links:
-     - redis
-     - postgres
+      - pg-data:/var/lib/postgresql/data
     ports:
-     - 9000:9000
-    environment:
-      SENTRY_SECRET_KEY: aaaaaaaabbbbbbbbccccccccdddddddd
-      SENTRY_POSTGRES_HOST: postgres
-      SENTRY_DB_USER: sentry
-      SENTRY_DB_PASSWORD: sentry
-      SENTRY_REDIS_HOST: redis
-
-  cron:
-    image: sentry
-    links:
-     - redis
-     - postgres
-    command: "sentry run cron"
-    environment:
-      SENTRY_SECRET_KEY: aaaaaaaabbbbbbbbccccccccdddddddd
-      SENTRY_POSTGRES_HOST: postgres
-      SENTRY_DB_USER: sentry
-      SENTRY_DB_PASSWORD: sentry
-      SENTRY_REDIS_HOST: redis
-
-  worker:
-    image: sentry
-    links:
-     - redis
-     - postgres
-    command: "sentry run worker"
-    environment:
-      SENTRY_SECRET_KEY: aaaaaaaabbbbbbbbccccccccdddddddd
-      SENTRY_POSTGRES_HOST: postgres
-      SENTRY_DB_USER: sentry
-      SENTRY_DB_PASSWORD: sentry
-      SENTRY_REDIS_HOST: redis
+      - '5432:5432'
+volumes:
+  redis-data:
+  pg-data:
