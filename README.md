@@ -2,24 +2,47 @@
 
 ## setup sentry container
 
-Generate secret key
+#### Copy .env-sample to .env
+
+```bash
+$ cp .env-sample .env
+```
+
+#### Generate secret key
 
 ```bash
 $ docker-compose run --rm sentry config generate-secret-key
 ```
 
-Initialize database and create Account
+* 生成されたsecret-keyを.envのSENTRY_SECRET_KEYにセットする
+
+#### Initialize database and create Account
 
 ```bash
 $ docker-compose run --rm sentry upgrade
 ```
 
-Start up
+* 実行すると、以下DBマイグレーションが行われる（5分程がかかる）
+
+  ```bash
+  :
+  > sentry:0470_org_saved_search
+  > sentry:0471_global_saved_search_types
+  > sentry:0472_auto__add_field_sentryapp_author
+  ```
+
+* 終わると、アカウントを作成されるか聞かれるので、作成を行う（Email,Passwordは適当な値でOK）
+
+  ```bash
+  Would you like to create a user account now? [Y/n]:
+  ```
+
+#### Start up
 
 ```bash
 $ docker-compose up -d
 ```
 
-Open Browser
+#### Open Browser
 
 * http://localhost:9000
