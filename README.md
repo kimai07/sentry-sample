@@ -31,7 +31,8 @@ $ docker-compose run --rm sentry upgrade
   > sentry:0472_auto__add_field_sentryapp_author
   ```
 
-* 終わると、アカウントを作成されるか聞かれるので、作成を行う（Email,Passwordは適当な値でOK）
+* 終わると、アカウントを作成されるか聞かれるので、作成を行う<br>
+（Emailは適当なアドレスでOK、ブラウザ上からログインする時に利用する）
 
   ```bash
   Would you like to create a user account now? [Y/n]:
